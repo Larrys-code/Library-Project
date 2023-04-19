@@ -36,9 +36,15 @@ function addBooksToLibrary(library, ...books) {
 }
 
 function displayLibrary(library) {
-  const bookShelf = document.querySelector();
+  const bookShelf = document.querySelector(".book-shelf");
+  library.forEach((book) => {
+    const bookCard = document.createElement("div");
+    bookCard.classList.add("book");
+    bookCard.textContent = book.info();
+    bookShelf.appendChild(bookCard);
+  });
 }
 
 const theHobbit = new Book("The Hobbit", "J.R.R. Tolkien", "295");
-console.log(theHobbit.info());
 addBooksToLibrary(myLibrary, theHobbit);
+displayLibrary(myLibrary);
