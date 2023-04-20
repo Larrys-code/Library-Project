@@ -46,14 +46,14 @@ function addBooksToLibrary(library, ...books) {
   });
 }
 
-function turnIntoBookForm() {}
+function turnIntoBookForm(library) {}
 
-function makeNewButton() {
+function makeNewButton(library) {
   const newButton = document.createElement("button");
   newButton.classList.add("new-book-button");
   newButton.textContent = "+";
   newButton.addEventListener("click", () => {
-    turnIntoBookForm();
+    turnIntoBookForm(library);
   });
   return newButton;
 }
@@ -66,16 +66,36 @@ function makeNewButton() {
 function displayLibrary(library) {
   const bookShelf = document.querySelector(".book-shelf");
   bookShelf.textContent = "";
-  library.forEach((book) => {
+
+  library.forEach((book, index) => {
     const bookCard = document.createElement("div");
     const bookInfo = book.formattedInfo();
+
+    const deleteButton = function makeDeleteButton() {
+      const newButton = document.createElement("button");
+      newButton.classList.add("delete-book-button");
+      newButton.textContent = "x";
+      newButton.addEventListener("click", function deleteOnClick() {
+        const clickedBook = this.parentElement;
+        const bookIndex = clickedBook.getAttribute("index");
+        library.splice(bookIndex, 1);
+        displayLibrary(library);
+      });
+      return newButton;
+    };
+
+    bookCard.appendChild(deleteButton());
     bookCard.classList.add("book");
+    bookCard.setAttribute("index", `${index}`);
+
     bookInfo.forEach((info) => {
       bookCard.appendChild(info);
     });
+
     bookShelf.appendChild(bookCard);
   });
-  const newButton = makeNewButton();
+
+  const newButton = makeNewButton(library);
   bookShelf.appendChild(newButton);
 }
 
@@ -88,5 +108,19 @@ const thePres = new Book(
   "1963",
   true
 );
-addBooksToLibrary(myLibrary, theHobblin, GOT, thePres);
+addBooksToLibrary(
+  myLibrary,
+  theHobblin,
+  GOT,
+  thePres,
+  theHobblin,
+  GOT,
+  thePres,
+  theHobblin,
+  GOT,
+  thePres,
+  theHobblin,
+  GOT,
+  thePres
+);
 displayLibrary(myLibrary);
