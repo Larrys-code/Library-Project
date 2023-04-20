@@ -1,5 +1,3 @@
-const myLibrary = [];
-
 /**
  * Creates a Book object from given variables. Title and author
  * take strings, pages is just the number of pages, and read is
@@ -35,6 +33,18 @@ function addBooksToLibrary(library, ...books) {
   });
 }
 
+function turnIntoBookForm() {}
+
+function makeNewButton() {
+  const newButton = document.createElement("button");
+  newButton.classList.add("new-book-button");
+  newButton.textContent = "+";
+  newButton.addEventListener("click", () => {
+    turnIntoBookForm();
+  });
+  return newButton;
+}
+
 /**
  * Takes each Book in the Library and displays them on the bookshelf; clearing
  * the shelf before it does so in order to allow for updates to the Library.
@@ -49,8 +59,11 @@ function displayLibrary(library) {
     bookCard.textContent = book.info();
     bookShelf.appendChild(bookCard);
   });
+  const newButton = makeNewButton();
+  bookShelf.appendChild(newButton);
 }
 
+const myLibrary = [];
 const theHobblin = new Book("The Hobblin", "J.R.R. Arr", "2695");
 const GOT = new Book("Game of Throws", "Wanna Bee", "2");
 const thePres = new Book(
