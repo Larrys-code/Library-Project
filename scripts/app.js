@@ -45,6 +45,13 @@ function displayLibrary(library) {
   });
 }
 
-const theHobbit = new Book("The Hobbit", "J.R.R. Tolkien", "295");
-addBooksToLibrary(myLibrary, theHobbit);
+const theHobblin = new Book("The Hobblin", "J.R.R. Arr", "2695");
+const GOT = new Book("Game of Throws", "Wanna Bee", "2");
+const thePres = new Book(
+  "The President Who Lived",
+  "J.F.K. Rowing",
+  "1963",
+  true
+);
+addBooksToLibrary(myLibrary, theHobblin, GOT, thePres);
 displayLibrary(myLibrary);
