@@ -35,8 +35,14 @@ function addBooksToLibrary(library, ...books) {
   });
 }
 
+/**
+ * Takes each Book in the Library and displays them on the bookshelf; clearing
+ * the shelf before it does so in order to allow for updates to the Library.
+ * @param {[]} library -Library array
+ */
 function displayLibrary(library) {
   const bookShelf = document.querySelector(".book-shelf");
+  bookShelf.textContent = "";
   library.forEach((book) => {
     const bookCard = document.createElement("div");
     bookCard.classList.add("book");
