@@ -19,6 +19,19 @@ function Book(title, author, pages, read = false) {
     `${this.title} by ${this.author}, ${this.pages}, ${
       this.read ? "finished reading" : "not read yet"
     }`;
+  this.formattedInfo = () => {
+    const bookTitle = document.createElement("h3");
+    const bookAuthor = document.createElement("h4");
+    const bookPages = document.createElement("p");
+    const bookRead = document.createElement("div");
+
+    bookTitle.textContent = `${this.title}`;
+    bookAuthor.textContent = `by ${this.author}`;
+    bookPages.textContent = `${this.pages} pages`;
+    bookRead.textContent = `${this.read ? "✔" : "✘"}`;
+    bookRead.classList.add(`${this.read ? "has-read" : "hasnt-read"}`);
+    return [bookTitle, bookAuthor, bookPages, bookRead];
+  };
 }
 
 /**
@@ -55,8 +68,11 @@ function displayLibrary(library) {
   bookShelf.textContent = "";
   library.forEach((book) => {
     const bookCard = document.createElement("div");
+    const bookInfo = book.formattedInfo();
     bookCard.classList.add("book");
-    bookCard.textContent = book.info();
+    bookInfo.forEach((info) => {
+      bookCard.appendChild(info);
+    });
     bookShelf.appendChild(bookCard);
   });
   const newButton = makeNewButton();
