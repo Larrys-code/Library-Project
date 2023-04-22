@@ -138,6 +138,8 @@ function displayLibrary(library) {
     const newButton = document.createElement("button");
     newButton.classList.add("new-book-button");
     newButton.textContent = "+";
+
+    // Make a book form in place of the Button
     newButton.addEventListener("click", function turnIntoBookForm() {
       bookShelf.removeChild(this);
 
