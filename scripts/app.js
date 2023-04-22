@@ -107,7 +107,7 @@ function displayLibrary(library) {
     const deleteButton = function makeDeleteButton() {
       const newButton = document.createElement("button");
       newButton.classList.add("delete-book-button");
-      newButton.textContent = "x";
+      newButton.textContent = "×";
       newButton.addEventListener("click", function deleteOnClick() {
         const clickedBook = this.parentElement;
         const bookIndex = clickedBook.getAttribute("index");
@@ -152,7 +152,7 @@ function displayLibrary(library) {
       const newDeleteButton = function makeDeleteButton() {
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("delete-book-button");
-        deleteButton.textContent = "x";
+        deleteButton.textContent = "×";
         deleteButton.addEventListener("click", () => {
           displayLibrary(library);
         });
@@ -195,27 +195,7 @@ function displayLibrary(library) {
 const myLibrary = [];
 const theHobblin = new Book("The Hobblin", "J.R.R. Arr", "2695");
 const GOT = new Book("Game of Throws", "Wanna Bee", "2");
-const thePres = new Book(
-  "The President Who Lived",
-  "J.F.K. Rowing",
-  "1963",
-  true
-);
-const test = new Book("The President Who Lived", "J.F.K. Rowing", "1963", true);
-addBooksToLibrary(
-  myLibrary,
-  theHobblin,
-  GOT,
-  thePres,
-  theHobblin,
-  GOT,
-  thePres,
-  theHobblin,
-  GOT,
-  thePres,
-  theHobblin,
-  GOT,
-  thePres,
-  test
-);
+const pres = new Book("The President Who Lived", "J.F.K. Rowing", "1963", true);
+const nine = new Book("1985", "Jeff", "1984", true);
+addBooksToLibrary(myLibrary, theHobblin, GOT, pres, nine);
 displayLibrary(myLibrary);

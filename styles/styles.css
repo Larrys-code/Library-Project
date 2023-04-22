@@ -21,6 +21,10 @@ body {
     min-height: 100vh;
 }
 
+button {
+    cursor: pointer;
+}
+
 .book-shelf {
     display: grid;
     gap: 2rem;
@@ -29,7 +33,12 @@ body {
     grid-column: 2/3;
 }
 
+.book.book-form {
+    cursor: default;
+}
+
 .book {
+    cursor: pointer;
     position: relative;
     display: grid;
     grid-template-rows: repeat(2, max-content) minmax(20px, 1fr) repeat(2, max-content);
@@ -81,5 +90,26 @@ button.new-book-button {
 }
 
 button.delete-book-button {
+    visibility: hidden;
+    display: grid;
+    align-content: center;
+    font-size: 2.5rem;
+    font-weight: 500;
+    transition: 0.1s;
+
+    color: white;
+    background-color: inherit;
+    border: 2px solid white;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 1.5rem;
     position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+.book:hover button.delete-book-button {
+    visibility: visible;
+    border: 2px solid var(--font-grey);
+    color: var(--font-grey);
 }
