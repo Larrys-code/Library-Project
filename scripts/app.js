@@ -58,16 +58,34 @@ function addBooksToLibrary(library, ...books) {
   });
 }
 
-function turnIntoBookForm(library) {}
+function makeInputDiv(type, name) {
+  const inputDiv = document.createElement("div");
+  const label = document.createElement("label");
+  const input = document.createElement("input");
 
-function makeNewButton(library) {
-  const newButton = document.createElement("button");
-  newButton.classList.add("new-book-button");
-  newButton.textContent = "+";
-  newButton.addEventListener("click", () => {
-    turnIntoBookForm(library);
-  });
-  return newButton;
+  input.setAttribute("type", `${type}`);
+  input.setAttribute("name", `${name}`);
+  input.setAttribute("id", `${name}`);
+  label.setAttribute("for", `${name}`);
+  switch (name) {
+    case "author":
+      label.textContent = "Author:";
+      break;
+    case "pages":
+      label.textContent = "Pages:";
+      break;
+    case "title":
+      label.textContent = "Title:";
+      break;
+    case "read":
+      label.textContent = "Read:";
+      break;
+    default:
+  }
+  inputDiv.classList.add("input-container", `${type}`);
+  inputDiv.appendChild(label);
+  inputDiv.appendChild(input);
+  return inputDiv;
 }
 
 /**
@@ -79,9 +97,12 @@ function displayLibrary(library) {
   const bookShelf = document.querySelector(".book-shelf");
   bookShelf.textContent = "";
 
+  // Make Cards for each book
   library.forEach((book, index) => {
     const bookCard = document.createElement("div");
     const bookInfo = book.formattedInfo();
+    bookCard.classList.add("book");
+    bookCard.setAttribute("index", `${index}`);
 
     const deleteButton = function makeDeleteButton() {
       const newButton = document.createElement("button");
@@ -95,10 +116,7 @@ function displayLibrary(library) {
       });
       return newButton;
     };
-
     bookCard.appendChild(deleteButton());
-    bookCard.classList.add("book");
-    bookCard.setAttribute("index", `${index}`);
 
     bookInfo.forEach((info) => {
       bookCard.appendChild(info);
@@ -115,8 +133,61 @@ function displayLibrary(library) {
     bookShelf.appendChild(bookCard);
   });
 
-  const newButton = makeNewButton(library);
-  bookShelf.appendChild(newButton);
+  // Make the Button to submit new books
+  const newBookButton = function makeNewButton() {
+    const newButton = document.createElement("button");
+    newButton.classList.add("new-book-button");
+    newButton.textContent = "+";
+    newButton.addEventListener("click", function turnIntoBookForm() {
+      bookShelf.removeChild(this);
+
+      // the bookForm goes into the bookCard, the bookForm will contain fields for the title, author, page number, a check for read, and a submit button
+      // each input should be in it's own div.
+      const bookCard = document.createElement("div");
+      const bookForm = document.createElement("form");
+      const submitButton = document.createElement("button");
+
+      const newDeleteButton = function makeDeleteButton() {
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete-book-button");
+        deleteButton.textContent = "x";
+        deleteButton.addEventListener("click", () => {
+          displayLibrary(library);
+        });
+        return deleteButton;
+      };
+      bookCard.appendChild(newDeleteButton());
+
+      submitButton.textContent = "Add Book";
+      submitButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        const formData = new FormData(bookForm);
+        const formObject = Object.fromEntries(formData);
+        const isRead = !!formObject.read;
+        const newBook = new Book(
+          formObject.title,
+          formObject.author,
+          formObject.pages,
+          isRead
+        );
+        addBooksToLibrary(library, newBook);
+        displayLibrary(library);
+      });
+
+      bookCard.classList.add("book", "book-form");
+      bookForm.setAttribute("id", "new-book");
+      bookForm.appendChild(makeInputDiv("text", "title"));
+      bookForm.appendChild(makeInputDiv("text", "author"));
+      bookForm.appendChild(makeInputDiv("number", "pages"));
+      bookForm.appendChild(makeInputDiv("checkbox", "read"));
+      bookForm.appendChild(submitButton);
+
+      bookCard.appendChild(bookForm);
+      bookShelf.appendChild(bookCard);
+    });
+    return newButton;
+  };
+  bookShelf.appendChild(newBookButton());
 }
 
 const myLibrary = [];
