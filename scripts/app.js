@@ -30,7 +30,19 @@ function Book(title, author, pages, read = false) {
     bookPages.textContent = `${this.pages} pages`;
     bookRead.textContent = `${this.read ? "✔" : "✘"}`;
     bookRead.classList.add(`${this.read ? "has-read" : "hasnt-read"}`);
+    bookRead.classList.add("read-marker");
     return [bookTitle, bookAuthor, bookPages, bookRead];
+  };
+  this.toggleRead = () => {
+    switch (this.read) {
+      case true:
+        this.read = false;
+        break;
+      case false:
+        this.read = true;
+        break;
+      default:
+    }
   };
 }
 
@@ -92,6 +104,14 @@ function displayLibrary(library) {
       bookCard.appendChild(info);
     });
 
+    bookCard.addEventListener("click", function toggleRead() {
+      const readDiv = this.querySelector(".read-marker");
+      readDiv.setAttribute("class", "read-marker");
+      book.toggleRead();
+      readDiv.textContent = `${book.read ? "✔" : "✘"}`;
+      readDiv.classList.add(`${book.read ? "has-read" : "hasnt-read"}`);
+    });
+
     bookShelf.appendChild(bookCard);
   });
 
@@ -108,6 +128,7 @@ const thePres = new Book(
   "1963",
   true
 );
+const test = new Book("The President Who Lived", "J.F.K. Rowing", "1963", true);
 addBooksToLibrary(
   myLibrary,
   theHobblin,
@@ -121,6 +142,7 @@ addBooksToLibrary(
   thePres,
   theHobblin,
   GOT,
-  thePres
+  thePres,
+  test
 );
 displayLibrary(myLibrary);
