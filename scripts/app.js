@@ -1,201 +1,249 @@
-/**
- * Creates a Book object from given variables. Title and author
- * take strings, pages is just the number of pages, and read is
- * a boolean.
- * @param {string} title -The title of the Book
- * @param {string} author -The name of the author
- * @param {(string|number)} pages -The number of pages
- * @param {boolean} [read = false] -Has this book been read
- */
-function Book(title, author, pages, read = false) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.read = read;
-  /**
-   * Gives info about the Book object as a string.
-   */
-  this.info = () =>
-    `${this.title} by ${this.author}, ${this.pages}, ${
-      this.read ? "finished reading" : "not read yet"
-    }`;
-  this.formattedInfo = () => {
-    const bookTitle = document.createElement("h3");
-    const bookAuthor = document.createElement("h4");
-    const bookPages = document.createElement("p");
-    const bookRead = document.createElement("div");
+const library = (() => {
+  const lib = [];
 
-    bookTitle.textContent = `${this.title}`;
-    bookAuthor.textContent = `by ${this.author}`;
-    bookPages.textContent = `${this.pages} pages`;
-    bookRead.textContent = `${this.read ? "✔" : "✘"}`;
-    bookRead.classList.add(`${this.read ? "has-read" : "hasnt-read"}`);
-    bookRead.classList.add("read-marker");
-    return [bookTitle, bookAuthor, bookPages, bookRead];
+  const add = (...books) => {
+    books.forEach((book) => {
+      lib.push(book);
+    });
+    library.updateIndex();
   };
-  this.toggleRead = () => {
-    switch (this.read) {
-      case true:
-        this.read = false;
+
+  const remove = (index) => {
+    lib.splice(index, 1);
+    library.updateIndex();
+  };
+
+  const updateIndex = () => {
+    lib.forEach((book, index) => {
+      book.setIndex(index);
+    });
+  };
+
+  const getBooks = () => [...lib];
+
+  return { add, remove, getBooks, updateIndex };
+})();
+
+const bookShelf = (() => {
+  const shelf = document.querySelector(".book-shelf");
+  const displayBook = (book) => {
+    const bookCard = book.makeBookCard();
+    shelf.appendChild(bookCard);
+  };
+  const displayAll = () => {
+    shelf.textContent = "";
+    const books = library.getBooks();
+    books.forEach((book) => {
+      displayBook(book);
+    });
+  };
+  const remove = (element) => {
+    shelf.removeChild(element);
+  };
+  const append = (element) => {
+    shelf.appendChild(element);
+  };
+  return { displayAll, displayBook, remove, append };
+})();
+
+const makeElement = (() => {
+  const deleteBookButton = (cancel = false) => {
+    const newButton = document.createElement("button");
+    newButton.classList.add("delete-book-button");
+    newButton.textContent = "×";
+    if (!cancel) {
+      newButton.addEventListener("click", function deleteOnClick() {
+        const clickedBook = this.parentElement;
+        const bookIndex = clickedBook.getAttribute("data-index");
+        library.remove(bookIndex);
+        makeElement.displayAll();
+      });
+      return newButton;
+    }
+    newButton.addEventListener("click", function cancelOnClick() {
+      const clickedForm = this.parentElement;
+      const newNewBookButton = newBookButton();
+      bookShelf.remove(clickedForm);
+      bookShelf.append(newNewBookButton);
+    });
+    return newButton;
+  };
+
+  const makeInputDiv = (type, name) => {
+    const inputDiv = document.createElement("div");
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+
+    input.setAttribute("type", `${type}`);
+    input.setAttribute("name", `${name}`);
+    input.setAttribute("id", `${name}`);
+    label.setAttribute("for", `${name}`);
+    switch (name) {
+      case "author":
+        label.textContent = "Author:";
         break;
-      case false:
-        this.read = true;
+      case "pages":
+        label.textContent = "Pages:";
+        break;
+      case "title":
+        label.textContent = "Title:";
+        break;
+      case "read":
+        label.textContent = "Read:";
         break;
       default:
     }
+    inputDiv.classList.add("input-container", `${type}`);
+    inputDiv.appendChild(label);
+    inputDiv.appendChild(input);
+    return inputDiv;
   };
-}
 
-/**
- * Takes given Book objects and pushes them into
- * the given Library array (An array of books).
- * @param {[]} library -Library array
- * @param  {...Book} books -One or more Book objects to add to the Library
- */
-function addBooksToLibrary(library, ...books) {
-  books.forEach((book) => {
-    library.push(book);
-  });
-}
+  const makeFormFromButton = () => {
+    const formCard = document.createElement("div");
+    const bookForm = document.createElement("form");
+    const submitButton = document.createElement("button");
 
-function makeInputDiv(type, name) {
-  const inputDiv = document.createElement("div");
-  const label = document.createElement("label");
-  const input = document.createElement("input");
+    const cancelButton = deleteBookButton(true);
+    formCard.appendChild(cancelButton);
 
-  input.setAttribute("type", `${type}`);
-  input.setAttribute("name", `${name}`);
-  input.setAttribute("id", `${name}`);
-  label.setAttribute("for", `${name}`);
-  switch (name) {
-    case "author":
-      label.textContent = "Author:";
-      break;
-    case "pages":
-      label.textContent = "Pages:";
-      break;
-    case "title":
-      label.textContent = "Title:";
-      break;
-    case "read":
-      label.textContent = "Read:";
-      break;
-    default:
-  }
-  inputDiv.classList.add("input-container", `${type}`);
-  inputDiv.appendChild(label);
-  inputDiv.appendChild(input);
-  return inputDiv;
-}
-
-/**
- * Takes each Book in the Library and displays them on the bookshelf; clearing
- * the shelf before it does so in order to allow for updates to the Library.
- * @param {[]} library -Library array
- */
-function displayLibrary(library) {
-  const bookShelf = document.querySelector(".book-shelf");
-  bookShelf.textContent = "";
-
-  // Make Cards for each book
-  library.forEach((book, index) => {
-    const bookCard = document.createElement("div");
-    const bookInfo = book.formattedInfo();
-    bookCard.classList.add("book");
-    bookCard.setAttribute("index", `${index}`);
-
-    const deleteButton = function makeDeleteButton() {
-      const newButton = document.createElement("button");
-      newButton.classList.add("delete-book-button");
-      newButton.textContent = "×";
-      newButton.addEventListener("click", function deleteOnClick() {
-        const clickedBook = this.parentElement;
-        const bookIndex = clickedBook.getAttribute("index");
-        library.splice(bookIndex, 1);
-        displayLibrary(library);
+    submitButton.textContent = "Add Book";
+    submitButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      const formData = new FormData(bookForm);
+      const formObject = Object.fromEntries(formData);
+      const isRead = !!formObject.read;
+      const addBook = newBook({
+        title: formObject.title,
+        author: formObject.author,
+        pages: formObject.pages,
+        hasRead: isRead,
       });
-      return newButton;
-    };
-    bookCard.appendChild(deleteButton());
-
-    bookInfo.forEach((info) => {
-      bookCard.appendChild(info);
+      library.add(addBook);
+      makeElement.displayAll();
     });
 
-    bookCard.addEventListener("click", function toggleRead() {
-      const readDiv = this.querySelector(".read-marker");
-      readDiv.setAttribute("class", "read-marker");
-      book.toggleRead();
-      readDiv.textContent = `${book.read ? "✔" : "✘"}`;
-      readDiv.classList.add(`${book.read ? "has-read" : "hasnt-read"}`);
-    });
+    formCard.classList.add("book", "book-form");
+    bookForm.setAttribute("id", "new-book");
+    bookForm.appendChild(makeInputDiv("text", "title"));
+    bookForm.appendChild(makeInputDiv("text", "author"));
+    bookForm.appendChild(makeInputDiv("number", "pages"));
+    bookForm.appendChild(makeInputDiv("checkbox", "read"));
+    bookForm.appendChild(submitButton);
 
-    bookShelf.appendChild(bookCard);
-  });
+    formCard.appendChild(bookForm);
+    bookShelf.append(formCard);
+  };
 
-  // Make the Button to submit new books
-  const newBookButton = function makeNewButton() {
+  const newBookButton = () => {
     const newButton = document.createElement("button");
     newButton.classList.add("new-book-button");
     newButton.textContent = "+";
 
     // Make a book form in place of the Button
     newButton.addEventListener("click", function turnIntoBookForm() {
-      bookShelf.removeChild(this);
-
-      // the bookForm goes into the bookCard, the bookForm will contain fields for the title, author, page number, a check for read, and a submit button
-      // each input should be in it's own div.
-      const bookCard = document.createElement("div");
-      const bookForm = document.createElement("form");
-      const submitButton = document.createElement("button");
-
-      const newDeleteButton = function makeDeleteButton() {
-        const deleteButton = document.createElement("button");
-        deleteButton.classList.add("delete-book-button");
-        deleteButton.textContent = "×";
-        deleteButton.addEventListener("click", () => {
-          displayLibrary(library);
-        });
-        return deleteButton;
-      };
-      bookCard.appendChild(newDeleteButton());
-
-      submitButton.textContent = "Add Book";
-      submitButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        const formData = new FormData(bookForm);
-        const formObject = Object.fromEntries(formData);
-        const isRead = !!formObject.read;
-        const newBook = new Book(
-          formObject.title,
-          formObject.author,
-          formObject.pages,
-          isRead
-        );
-        addBooksToLibrary(library, newBook);
-        displayLibrary(library);
-      });
-
-      bookCard.classList.add("book", "book-form");
-      bookForm.setAttribute("id", "new-book");
-      bookForm.appendChild(makeInputDiv("text", "title"));
-      bookForm.appendChild(makeInputDiv("text", "author"));
-      bookForm.appendChild(makeInputDiv("number", "pages"));
-      bookForm.appendChild(makeInputDiv("checkbox", "read"));
-      bookForm.appendChild(submitButton);
-
-      bookCard.appendChild(bookForm);
-      bookShelf.appendChild(bookCard);
+      bookShelf.remove(this);
+      makeFormFromButton();
     });
     return newButton;
   };
-  bookShelf.appendChild(newBookButton());
-}
 
-const myLibrary = [];
-const theHobblin = new Book("The Hobblin", "J.R.R. Arr", "2695");
-const GOT = new Book("Game of Throws", "Wanna Bee", "2");
-const pres = new Book("The President Who Lived", "J.F.K. Rowing", "1963", true);
-const nine = new Book("1985", "Jeff", "1984", true);
-addBooksToLibrary(myLibrary, theHobblin, GOT, pres, nine);
-displayLibrary(myLibrary);
+  const displayAll = () => {
+    bookShelf.displayAll();
+    bookShelf.append(newBookButton());
+  };
+
+  return { deleteBookButton, displayAll };
+})();
+
+const newBook = ({ title, author, pages, hasRead = false }) => {
+  let read = hasRead;
+  let index;
+  const formattedInfo = () => {
+    const bookTitle = document.createElement("h3");
+    const bookAuthor = document.createElement("h4");
+    const bookPages = document.createElement("p");
+    const bookRead = document.createElement("div");
+
+    bookTitle.textContent = `${title}`;
+    bookAuthor.textContent = `by ${author}`;
+    bookPages.textContent = `${pages} pages`;
+    bookRead.textContent = `${read ? "✔" : "✘"}`;
+    bookRead.classList.add(`${read ? "has-read" : "hasnt-read"}`);
+    bookRead.classList.add("read-marker");
+    return [bookTitle, bookAuthor, bookPages, bookRead];
+  };
+  const toggleRead = () => {
+    switch (read) {
+      case true:
+        read = false;
+        break;
+      case false:
+        read = true;
+        break;
+      default:
+        break;
+    }
+  };
+  const setIndex = (newIndex) => {
+    index = newIndex;
+  };
+  const getIndex = () => index;
+  const makeBookCard = () => {
+    const bookCard = document.createElement("div");
+    const bookInfo = formattedInfo();
+    const deleteButton = makeElement.deleteBookButton();
+    bookCard.appendChild(deleteButton);
+    bookCard.classList.add("book");
+    bookCard.setAttribute("data-index", `${index}`);
+    bookInfo.forEach((info) => {
+      bookCard.appendChild(info);
+    });
+    bookCard.addEventListener("click", function toggleOnClick() {
+      const readDiv = this.querySelector(".read-marker");
+      readDiv.setAttribute("class", "read-marker");
+      toggleRead();
+      readDiv.textContent = `${read ? "✔" : "✘"}`;
+      readDiv.classList.add(`${read ? "has-read" : "hasnt-read"}`);
+    });
+    return bookCard;
+  };
+  return { toggleRead, formattedInfo, makeBookCard, setIndex, getIndex };
+};
+
+// const theHobblin = Book("The Hobblin", "J.R.R. Arr", "2695");
+// const GOT = Book("Game of Throws", "Wanna Bee", "2");
+// const pres = Book("The President Who Lived", "J.F.K. Rowing", "1963", true);
+// const nine = Book("1985", "Jeff", "1984", true);
+
+library.add(
+  newBook({
+    title: "The Hobblet",
+    author: "J.R.R. Ar",
+    pages: "2675",
+    hasRead: true,
+  }),
+  newBook({
+    title: "The Hobblin",
+    author: "J.R.R. Arr",
+    pages: "2695",
+  }),
+  newBook({
+    title: "Game of Throws",
+    author: "Wanna Bee",
+    pages: "2",
+  }),
+  newBook({
+    title: "The President Who Lived",
+    author: "J.F.K. Rowing",
+    pages: "1963",
+    hasRead: true,
+  }),
+  newBook({
+    title: "1985",
+    author: "Jeff",
+    pages: "1984",
+    hasRead: true,
+  })
+);
+makeElement.displayAll();
