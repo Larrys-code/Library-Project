@@ -40,7 +40,7 @@
 
 This project was built after several lessons on linting, **Objects** and **constructors**. As such this project was a review in applying those concepts.
 
-This is the first project in which I used **Prettier** and **ESLint**, following the [AirBnB Style Guide](), in an effort to produce more maintainable code.
+This is the first project in which I used **Prettier** and **ESLint**, following the [AirBnB Style Guide](https://github.com/airbnb/javascript), in an effort to produce more maintainable code.
 
 ### Built With
 
